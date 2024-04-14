@@ -1,14 +1,33 @@
-import restaurants from "../utils/mockData";
 import Restaurant from "./Restaurant";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { RESTAURANTS_URL } from "../utils/constants";
+import Shimmer from "./Shimmer";
 
 const Body = () => {
-  const [listOfRestaurants, setListOfRestaurants] = useState(restaurants);
+  const [listOfRestaurants, setListOfRestaurants] = useState([]);
+
+  const getRestaurants = async () => {
+    const data = await fetch(RESTAURANTS_URL);
+
+    const json = await data.json();
+
+    setListOfRestaurants(
+      json?.data?.cards[1]?.card?.card?.gridElements?.infoWithStyle?.restaurants
+    );
+  };
+
+  useEffect(() => {
+    getRestaurants();
+  }, []);
 
   const filterRestaurants = () =>
     setListOfRestaurants(
       listOfRestaurants.filter((rest) => rest.info.avgRating > 4.1)
     );
+
+  if (listOfRestaurants.length === 0) {
+    return <Shimmer />;
+  }
 
   return (
     <div className="body">
