@@ -5,6 +5,8 @@ import Shimmer from "./Shimmer";
 
 const Body = () => {
   const [listOfRestaurants, setListOfRestaurants] = useState([]);
+  const [filteredRestaurants, setFilteredRestaurants] = useState([]);
+  const [searchString, setSearchString] = useState("");
 
   const getRestaurants = async () => {
     const data = await fetch(RESTAURANTS_URL);
@@ -12,6 +14,9 @@ const Body = () => {
     const json = await data.json();
 
     setListOfRestaurants(
+      json?.data?.cards[1]?.card?.card?.gridElements?.infoWithStyle?.restaurants
+    );
+    setFilteredRestaurants(
       json?.data?.cards[1]?.card?.card?.gridElements?.infoWithStyle?.restaurants
     );
   };
@@ -25,19 +30,34 @@ const Body = () => {
       listOfRestaurants.filter((rest) => rest.info.avgRating > 4.1)
     );
 
-  if (listOfRestaurants.length === 0) {
-    return <Shimmer />;
-  }
+  const searchRestaurants = () => {
+    setFilteredRestaurants(
+      listOfRestaurants.filter((rest) =>
+        rest.info.name.toLowerCase().includes(searchString.toLowerCase())
+      )
+    );
+  };
 
-  return (
+  return listOfRestaurants.length === 0 ? (
+    <Shimmer />
+  ) : (
     <div className="body">
       <div className="filter">
-        <button className="fiter-btn" onClick={filterRestaurants}>
+        <div className="search">
+          <input
+            value={searchString}
+            onChange={(e) => setSearchString(e.target.value)}
+          ></input>
+          <button className="search-btn" onClick={searchRestaurants}>
+            Search
+          </button>
+        </div>
+        <button className="filter-btn" onClick={filterRestaurants}>
           Top Rated Restaurants
         </button>
       </div>
       <div className="resto-container">
-        {listOfRestaurants.map((restaurant) => (
+        {filteredRestaurants.map((restaurant) => (
           <Restaurant key={restaurant.info.id} restData={restaurant} />
         ))}
       </div>

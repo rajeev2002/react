@@ -57,3 +57,17 @@
   margin: 5px;
   background-color: #f0f0f0;
 }
+
+.login-btn,
+.filter-btn,
+.search-btn {
+  cursor: pointer;
+}
+
+.search-btn {
+  margin: 0 5px;
+}
+
+.filter {
+  display: flex;
+}
